@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -12,8 +14,11 @@ class AuthController extends Controller
     {
         if(Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             return 'logged in';
-        } else {
-            return 'invalid credintials';
+        } else if($user = User::whereName($request->email)->first()) {
+            if(Hash::check($request->password, $user->password)){
+                return 'logged in';
+            }
         }
+        
     }
 }
